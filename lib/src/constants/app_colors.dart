@@ -20,6 +20,7 @@ class AppColors {
   // --- Textos ---
   static const Color textPrimary = Color(0xFF1C2A35); // Gris oscuro
   static const Color textSecondary = Color(0xFF607D8B); // Gris azulado suave
+  static const Color textDark = Color.fromARGB(255, 16, 16, 16);
 
   // --- Bordes e Inputs ---
   static const Color inputBorder = Color(0xFFCFD8DC); // Gris claro

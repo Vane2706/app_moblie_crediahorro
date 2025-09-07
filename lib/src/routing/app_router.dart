@@ -1,5 +1,6 @@
 import 'package:crediahorro/src/features/auth/login/LoginPage.dart';
 import 'package:crediahorro/src/features/auth/register/RegisterPage.dart';
+import 'package:crediahorro/src/features/clients/client_form_page.dart';
 import 'package:crediahorro/src/features/clients/clients_page.dart';
 import 'package:crediahorro/src/features/dashboard/dashboard_screen.dart';
 import 'package:crediahorro/src/features/loans/loans_page.dart';
@@ -15,6 +16,7 @@ class AppRouter {
   static const String prestamos = '/prestamos';
   static const String reportes = '/reportes';
   static const String configuracion = '/configuracion';
+  static const String clienteForm = '/cliente-form';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -32,6 +34,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ReportsPage());
       case configuracion:
         return MaterialPageRoute(builder: (_) => const SettingsPage());
+      case clienteForm:
+        return MaterialPageRoute(builder: (_) => const ClientFormPage());
       default:
         return MaterialPageRoute(
           builder: (_) =>

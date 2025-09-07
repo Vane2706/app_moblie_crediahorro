@@ -1,6 +1,7 @@
 import 'package:crediahorro/src/common_widgets/app_logo.dart';
 import 'package:crediahorro/src/constants/app_colors.dart';
 import 'package:crediahorro/src/constants/app_text_styles.dart';
+import 'package:crediahorro/src/layouts/app_scaffold.dart';
 import 'package:crediahorro/src/routing/app_router.dart';
 import 'package:flutter/material.dart';
 
@@ -32,17 +33,8 @@ class DashboardScreen extends StatelessWidget {
       ),
     ];
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          "Dashboard",
-          style: AppTextStyles.screenTitle.copyWith(color: AppColors.primary),
-        ),
-      ),
-      backgroundColor: AppColors.background,
+    return AppScaffold(
+      title: "Dashboard",
       body: Column(
         children: [
           const SizedBox(height: 20),
