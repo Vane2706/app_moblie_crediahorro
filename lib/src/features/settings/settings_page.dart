@@ -11,7 +11,11 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<_SettingItem> items = [
-      _SettingItem(title: "Perfil", icon: Icons.person, onTap: () {}),
+      _SettingItem(
+        title: "Perfil",
+        icon: Icons.person,
+        onTap: () => Navigator.pushNamed(context, AppRouter.perfil),
+      ),
       _SettingItem(
         title: "Notificaciones",
         icon: Icons.notifications,
@@ -56,7 +60,7 @@ class SettingsPage extends StatelessWidget {
                   onTap: item.onTap,
                 );
               },
-              separatorBuilder: (_, __) => const Divider(),
+              separatorBuilder: (_, _) => const Divider(),
             ),
           ),
         ],

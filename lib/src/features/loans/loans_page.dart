@@ -109,8 +109,8 @@ class _LoansPageState extends State<LoansPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
         backgroundColor: const Color.fromARGB(255, 236, 240, 245),
-        icon: const Icon(Icons.add),
-        label: const Text("Nuevo"),
+        icon: const Icon(Icons.add, color: Colors.black),
+        label: const Text("Nuevo", style: TextStyle(color: Colors.black)),
       ),
     );
   }

@@ -1,14 +1,14 @@
 import 'package:crediahorro/src/common_widgets/app_logo.dart';
-import 'package:crediahorro/src/common_widgets/custom_text_field.dart';
-import 'package:crediahorro/src/common_widgets/primary_button.dart';
-import 'package:crediahorro/src/constants/app_text_styles.dart';
 import 'package:crediahorro/src/domain/utils/Resource.dart';
-import 'package:crediahorro/src/features/auth/register/RegisterBloc.dart';
 import 'package:crediahorro/src/features/auth/register/RegisterEvent.dart';
-import 'package:crediahorro/src/features/auth/register/RegisterState.dart';
-import 'package:crediahorro/src/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:crediahorro/src/features/auth/register/RegisterBloc.dart';
+import 'package:crediahorro/src/features/auth/register/RegisterState.dart';
+import 'package:crediahorro/src/constants/app_colors.dart';
+import 'package:crediahorro/src/constants/app_text_styles.dart';
+import 'package:crediahorro/src/common_widgets/custom_text_field.dart';
+import 'package:crediahorro/src/common_widgets/primary_button.dart';
 
 class RegisterContent extends StatelessWidget {
   const RegisterContent({super.key});
@@ -58,6 +58,15 @@ class RegisterContent extends StatelessWidget {
                     keyboardType: TextInputType.phone,
                     onChanged: (value) => context.read<RegisterBloc>().add(
                       RegisterWhatsappChanged(value),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  CustomTextField(
+                    label: "Correo electrónico",
+                    hint: "Ingresa tu email",
+                    onChanged: (value) => context.read<RegisterBloc>().add(
+                      RegisterEmailChanged(value),
                     ),
                   ),
                   const SizedBox(height: 20),

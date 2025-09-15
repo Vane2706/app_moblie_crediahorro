@@ -1,7 +1,7 @@
 enum Status { loading, success, error }
 
 class Resource<T> {
-  final Status status;
+  final Status? status;
   final T? data;
   final String? message;
 

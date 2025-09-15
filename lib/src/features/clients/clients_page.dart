@@ -101,12 +101,13 @@ class _ClientsPageState extends State<ClientsPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.pushNamed(context, AppRouter.clienteForm);
         },
         backgroundColor: const Color.fromARGB(255, 236, 240, 245),
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add, color: Colors.black),
+        label: const Text("Agregar", style: TextStyle(color: Colors.black)),
       ),
     );
   }
