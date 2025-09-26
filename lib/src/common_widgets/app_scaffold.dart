@@ -46,7 +46,7 @@ class _AppScaffoldState extends State<AppScaffold> {
         Navigator.pushNamed(context, AppRouter.reportes);
         break;
       case 3:
-        Navigator.pushNamed(context, AppRouter.perfil);
+        Navigator.pushNamed(context, AppRouter.perfiloverview);
         break;
       case 4:
         Navigator.pushNamed(context, AppRouter.configuracion);

@@ -10,7 +10,7 @@ class ReportsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: "Reportes",
+      title: "CREDIAHORRO",
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

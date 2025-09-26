@@ -1,8 +1,7 @@
 import 'package:crediahorro/src/services/AuthService.dart';
 import 'package:flutter/material.dart';
 import 'package:crediahorro/src/routing/app_router.dart';
-import 'package:crediahorro/src/common_widgets/profile_avatar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'app_logo.dart'; // Asegúrate de importar tu AppLogo
 
 class AppSidebar extends StatefulWidget {
   final VoidCallback onClose;
@@ -13,26 +12,10 @@ class AppSidebar extends StatefulWidget {
 }
 
 class _AppSidebarState extends State<AppSidebar> {
-  String? _profileImagePath;
-  String? _profileName;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProfileData();
-  }
-
-  Future<void> _loadProfileData() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _profileImagePath = prefs.getString('profile_image');
-      _profileName = prefs.getString('profile_name') ?? "Usuario";
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final AuthService _authService = AuthService();
+
     final items = [
       _SidebarItem("Home", Icons.dashboard_rounded, AppRouter.dashboard),
       _SidebarItem("Clientes", Icons.people_alt_rounded, AppRouter.clientes),
@@ -52,8 +35,8 @@ class _AppSidebarState extends State<AppSidebar> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 233, 241, 246), // Azul suave
-                Color.fromARGB(255, 233, 241, 246), // Morado elegante
+                Color.fromARGB(255, 233, 241, 246),
+                Color.fromARGB(255, 233, 241, 246),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -63,7 +46,7 @@ class _AppSidebarState extends State<AppSidebar> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Encabezado
+              // Encabezado con logo + botón cerrar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -84,7 +67,7 @@ class _AppSidebarState extends State<AppSidebar> {
               ),
               const SizedBox(height: 25),
 
-              // Perfil mejorado
+              // Logo centrado y dinámico
               Center(
                 child: Column(
                   children: [
@@ -99,33 +82,17 @@ class _AppSidebarState extends State<AppSidebar> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.25),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
                       ),
-                      padding: const EdgeInsets.all(3),
-                      child: ProfileAvatar(
-                        imagePath: _profileImagePath,
-                        size: 100,
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            AppRouter.perfil,
-                          ).then((_) => _loadProfileData());
-                        },
-                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: const AppLogo(size: 100), // Aquí se usa el logo
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      _profileName ?? "",
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
+                    const SizedBox(height: 15),
+                    const Text(
+                      "Tu socio financiero",
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 25),
@@ -149,7 +116,7 @@ class _AppSidebarState extends State<AppSidebar> {
                 ),
               ),
 
-              // Opciones con divisores sutiles
+              // Opciones con animación al hover
               Expanded(
                 child: ListView.separated(
                   itemBuilder: (_, index) {
@@ -161,7 +128,7 @@ class _AppSidebarState extends State<AppSidebar> {
                     height: 1,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Colors.black.withOpacity(0.1), Colors.black],
+                        colors: [Colors.black.withOpacity(0.1), Colors.black12],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),
@@ -171,7 +138,7 @@ class _AppSidebarState extends State<AppSidebar> {
                 ),
               ),
 
-              // Cerrar sesión
+              // Divider antes del logout
               const SizedBox(height: 16),
               Container(
                 height: 1,
@@ -187,6 +154,8 @@ class _AppSidebarState extends State<AppSidebar> {
                 ),
               ),
               const SizedBox(height: 10),
+
+              // Cerrar sesión
               ListTile(
                 leading: const Icon(Icons.logout_rounded, color: Colors.black),
                 title: const Text(
@@ -194,11 +163,11 @@ class _AppSidebarState extends State<AppSidebar> {
                   style: TextStyle(color: Colors.black, fontSize: 15),
                 ),
                 onTap: () async {
-                  await _authService.logout(); // limpia el token
+                  await _authService.logout();
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     AppRouter.login,
-                    (route) => false, // elimina todas las rutas anteriores
+                    (route) => false,
                   );
                 },
               ),
@@ -244,14 +213,11 @@ class _SidebarTileState extends State<_SidebarTile> {
           borderRadius: BorderRadius.circular(14),
         ),
         child: ListTile(
-          leading: Icon(
-            widget.item.icon,
-            color: _hovered ? Colors.black : Colors.black,
-          ),
+          leading: Icon(widget.item.icon, color: Colors.black),
           title: Text(
             widget.item.title,
             style: TextStyle(
-              color: _hovered ? Colors.black : Colors.black,
+              color: Colors.black,
               fontWeight: _hovered ? FontWeight.bold : FontWeight.w500,
               fontSize: 15.5,
             ),
