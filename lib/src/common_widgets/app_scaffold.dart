@@ -22,7 +22,7 @@ class AppScaffold extends StatefulWidget {
 
 class _AppScaffoldState extends State<AppScaffold> {
   bool _isSidebarOpen = false;
-  int _selectedIndex = 0; // 👈 para saber qué botón está activo
+  int _selectedIndex = 0;
 
   void _toggleSidebar() {
     setState(() {
@@ -35,7 +35,6 @@ class _AppScaffoldState extends State<AppScaffold> {
       _selectedIndex = index;
     });
 
-    // 👇 Aquí defines la navegación según el botón
     switch (index) {
       case 0:
         Navigator.pushNamed(context, AppRouter.dashboard);
@@ -86,29 +85,41 @@ class _AppScaffoldState extends State<AppScaffold> {
 
           floatingActionButton: widget.floatingActionButton,
 
-          // 🔽 Barra de navegación inferior
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _onNavTapped,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: Colors.black,
-            unselectedItemColor: Colors.grey,
-            selectedLabelStyle: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
+          // 🔽 Barra de navegación inferior personalizada
+          bottomNavigationBar: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white, // fondo blanco
+              border: Border(
+                top: BorderSide(
+                  color: Colors.black, // línea negra arriba
+                  width: 1,
+                ),
+              ),
             ),
-            unselectedLabelStyle: const TextStyle(fontSize: 12),
-            items: [
-              _buildNavItem(Icons.home, "Home", 0),
-              _buildNavItem(Icons.people, "Clientes", 1),
-              _buildNavItem(Icons.bar_chart, "Estadísticas", 2),
-              _buildNavItem(Icons.person, "Perfil", 3),
-              _buildNavItem(Icons.settings, "Ajustes", 4),
-            ],
+            child: BottomNavigationBar(
+              backgroundColor: Colors.white,
+              elevation: 0, // sin sombra, ya tenemos la línea
+              currentIndex: _selectedIndex,
+              onTap: _onNavTapped,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: Colors.black,
+              unselectedItemColor: Colors.grey,
+              selectedLabelStyle: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+              unselectedLabelStyle: const TextStyle(fontSize: 12),
+              items: [
+                _buildNavItem(Icons.home, "Home", 0),
+                _buildNavItem(Icons.people, "Clientes", 1),
+                _buildNavItem(Icons.bar_chart, "Estadísticas", 2),
+                _buildNavItem(Icons.person, "Perfil", 3),
+                _buildNavItem(Icons.settings, "Ajustes", 4),
+              ],
+            ),
           ),
         ),
 
-        // Sidebar overlay
         if (_isSidebarOpen) ...[
           GestureDetector(
             onTap: _toggleSidebar,
@@ -123,7 +134,6 @@ class _AppScaffoldState extends State<AppScaffold> {
     );
   }
 
-  /// 👇 Método auxiliar para animar el crecimiento de ícono/texto al seleccionar
   BottomNavigationBarItem _buildNavItem(
     IconData icon,
     String label,
@@ -133,7 +143,7 @@ class _AppScaffoldState extends State<AppScaffold> {
 
     return BottomNavigationBarItem(
       icon: AnimatedScale(
-        scale: isSelected ? 1.2 : 1.0, // crece si está seleccionado
+        scale: isSelected ? 1.2 : 1.0,
         duration: const Duration(milliseconds: 200),
         child: Icon(icon),
       ),
