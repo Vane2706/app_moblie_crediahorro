@@ -1,116 +1,206 @@
-import 'package:crediahorro/src/layouts/app_scaffold.dart';
-import 'package:flutter/material.dart';
+import 'package:crediahorro/src/features/clients/models/cliente.dart';
+import 'package:crediahorro/src/features/loans/loan_edit_page.dart';
+import 'package:crediahorro/src/features/loans/loan_form_page.dart';
+import 'package:crediahorro/src/services/cliente_service.dart';
+import 'package:crediahorro/src/common_widgets/app_scaffold.dart';
 import 'package:crediahorro/src/constants/app_colors.dart';
-import 'package:crediahorro/src/constants/app_text_styles.dart';
-import 'package:crediahorro/src/common_widgets/app_logo.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class LoansPage extends StatefulWidget {
-  const LoansPage({super.key});
+  final int clienteId;
+  const LoansPage({super.key, required this.clienteId});
 
   @override
   State<LoansPage> createState() => _LoansPageState();
 }
 
 class _LoansPageState extends State<LoansPage> {
-  final TextEditingController _searchController = TextEditingController();
-  final List<String> _allLoans = List.generate(15, (i) => "Préstamo #${i + 1}");
-  List<String> _filteredLoans = [];
+  late Future<Cliente> _clienteFuture;
+  final ClienteService _clienteService = ClienteService();
 
   @override
   void initState() {
     super.initState();
-    _filteredLoans = _allLoans;
-    _searchController.addListener(_filterLoans);
+    _clienteFuture = _clienteService.getClienteById(widget.clienteId);
   }
 
-  void _filterLoans() {
-    final query = _searchController.text.toLowerCase();
+  void _reload() {
     setState(() {
-      _filteredLoans = _allLoans
-          .where((l) => l.toLowerCase().contains(query))
-          .toList();
+      _clienteFuture = _clienteService.getClienteById(widget.clienteId);
     });
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  String _formatCurrency(double value) {
+    return NumberFormat.currency(symbol: 'S/', locale: 'es_PE').format(value);
+  }
+
+  String _formatDate(String fecha) {
+    try {
+      final date = DateTime.parse(fecha);
+      return DateFormat("dd/MM/yyyy").format(date);
+    } catch (_) {
+      return fecha;
+    }
+  }
+
+  void _mostrarAccionesPrestamo(Cliente cliente, prestamo) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.visibility, color: AppColors.primary),
+              title: const Text("Ver Cuotas"),
+              onTap: () {
+                Navigator.pop(context);
+                // 👉 Navegar a cuotas
+              },
+            ),
+            if (prestamo.estado != "PAGADO")
+              ListTile(
+                leading: const Icon(Icons.edit, color: AppColors.primary),
+                title: const Text("Editar Préstamo"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => LoanEditPage(
+                        clienteId: cliente.id!,
+                        prestamoId: prestamo.id!,
+                      ),
+                    ),
+                  );
+                  _reload();
+                },
+              ),
+            if (prestamo.estado == "PAGADO")
+              ListTile(
+                leading: const Icon(Icons.file_present, color: Colors.green),
+                title: const Text("Exportar Excel"),
+                onTap: () {
+                  Navigator.pop(context);
+                  // 👉 Exportar Excel
+                },
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: "Préstamos",
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          const AppLogo(size: 80),
-          const SizedBox(height: 10),
-          Text(
-            "Gestión de Préstamos",
-            style: AppTextStyles.screenTitle.copyWith(
-              color: AppColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 20),
+      title: "CREDIAHORRO",
+      body: FutureBuilder<Cliente>(
+        future: _clienteFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          }
+          if (!snapshot.hasData ||
+              snapshot.data!.prestamos == null ||
+              snapshot.data!.prestamos!.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(
+                    Icons.account_balance_wallet_outlined,
+                    size: 50,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    "No existen préstamos",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
 
-          // Buscador
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: "Buscar préstamo...",
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: AppColors.surface,
-                border: OutlineInputBorder(
+          final cliente = snapshot.data!;
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(12),
+            itemCount: cliente.prestamos!.length,
+            itemBuilder: (context, index) {
+              final prestamo = cliente.prestamos![index];
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 233, 241, 246),
                   borderRadius: BorderRadius.circular(12),
                 ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Lista filtrada
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemBuilder: (_, index) {
-                final loan = _filteredLoans[index];
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                child: ListTile(
+                  onTap: () => _mostrarAccionesPrestamo(cliente, prestamo),
+                  leading: const CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Colors.blueGrey,
+                    child: Icon(Icons.attach_money, color: Colors.white),
                   ),
-                  elevation: 3,
-                  child: ListTile(
-                    leading: const Icon(
-                      Icons.attach_money,
-                      color: AppColors.primary,
+                  title: Text(
+                    _formatCurrency(prestamo.monto),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
                     ),
-                    title: Text(loan),
-                    subtitle: const Text("Monto: S/ 1,500 - Estado: Activo"),
-                    trailing: const Icon(
-                      Icons.arrow_forward_ios,
-                      size: 18,
-                      color: AppColors.textSecondary,
-                    ),
-                    onTap: () {},
                   ),
-                );
-              },
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemCount: _filteredLoans.length,
-            ),
-          ),
-        ],
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Interés: ${prestamo.tasaInteresMensual}%"),
+                      Text("Cuotas: ${prestamo.numeroCuotas}"),
+                      Text("Creación: ${_formatDate(prestamo.fechaCreacion)}"),
+                      Text(
+                        "Estado: ${prestamo.estado ?? "N/A"}",
+                        style: TextStyle(
+                          color: prestamo.estado == "PAGADO"
+                              ? Colors.green
+                              : Colors.orange,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  trailing: const Icon(
+                    Icons.more_vert,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              );
+            },
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        backgroundColor: const Color.fromARGB(255, 236, 240, 245),
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => LoanFormPage(clienteId: widget.clienteId),
+            ),
+          );
+          _reload();
+        },
+        backgroundColor: Colors.white,
         icon: const Icon(Icons.add, color: Colors.black),
-        label: const Text("Nuevo", style: TextStyle(color: Colors.black)),
+        label: const Text("Agregar", style: TextStyle(color: Colors.black)),
       ),
     );
   }

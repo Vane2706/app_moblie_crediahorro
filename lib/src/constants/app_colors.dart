@@ -5,8 +5,10 @@ class AppColors {
 
   // --- Colores Principales (Branding CrediAhorro) ---
   static const Color primary = Color(0xFF0D47A1); // Azul oscuro institucional
-  static const Color secondary = Color.fromARGB(255, 66, 68, 70);
+  static const Color secondary = Color.fromARGB(255, 86, 87, 87);
   static const Color accent = Color(0xFFFBC02D); // Amarillo dorado elegante
+  static const Color transparent = Colors.transparent;
+  static const Color black = Colors.black;
 
   // --- Colores de Branding (variantes suaves) ---
   static const Color lightBlue = Color(0xFF5472D3); // Azul más claro

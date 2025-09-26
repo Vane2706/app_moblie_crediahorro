@@ -2,25 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:crediahorro/src/common_widgets/app_scaffold.dart';
 import 'package:crediahorro/src/constants/app_colors.dart';
-import 'package:crediahorro/src/services/cliente_service.dart';
-import 'package:crediahorro/src/features/clients/models/cliente.dart';
+import 'package:crediahorro/src/features/loans/models/loans.dart';
+import 'package:crediahorro/src/services/loan_service.dart';
 
-class ClienteFormPage extends StatefulWidget {
-  const ClienteFormPage({super.key});
+class LoanFormPage extends StatefulWidget {
+  final int clienteId;
+  const LoanFormPage({super.key, required this.clienteId});
 
   @override
-  State<ClienteFormPage> createState() => _ClienteFormPageState();
+  State<LoanFormPage> createState() => _LoanFormPageState();
 }
 
-class _ClienteFormPageState extends State<ClienteFormPage> {
+class _LoanFormPageState extends State<LoanFormPage> {
   final _formKey = GlobalKey<FormState>();
-  final ClienteService _clienteService = ClienteService();
-
-  final _nombreController = TextEditingController();
-  final _dniController = TextEditingController();
-  final _direccionController = TextEditingController();
-  final _whatsappController = TextEditingController();
-  final _correoController = TextEditingController();
+  final LoanService _loanService = LoanService();
 
   final _montoController = TextEditingController();
   final _tasaController = TextEditingController();
@@ -31,7 +26,16 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
   String _tipoCuota = "MENSUAL"; // default
   bool _loading = false;
 
-  // Abre el date picker y muestra la fecha en dd/MM/yyyy en el TextField
+  @override
+  void initState() {
+    super.initState();
+    // Por defecto, fecha de creación = hoy
+    _fechaCreacionController.text = DateFormat(
+      "dd/MM/yyyy",
+    ).format(DateTime.now());
+  }
+
+  // Abrir datepicker y setear en formato dd/MM/yyyy
   Future<void> _seleccionarFecha(TextEditingController controller) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -47,49 +51,36 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
     }
   }
 
-  // Convierte dd/MM/yyyy -> yyyy-MM-dd (backend)
+  // Convertir fecha a yyyy-MM-dd (para backend)
   String _convertirFecha(String fechaDDMMYYYY) {
     if (fechaDDMMYYYY.trim().isEmpty) return fechaDDMMYYYY;
     try {
       final DateTime parsed = DateFormat("dd/MM/yyyy").parse(fechaDDMMYYYY);
       return DateFormat("yyyy-MM-dd").format(parsed);
     } catch (_) {
-      return fechaDDMMYYYY; // fallback si el formato no es el esperado
+      return fechaDDMMYYYY;
     }
   }
 
-  void _guardarCliente() async {
+  Future<void> _guardarPrestamo() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
 
     try {
-      // IMPORTANTE: correoElectronico debe ser String (no null) porque tu modelo lo requiere.
-      // Si el campo está vacío, enviamos cadena vacía "" para evitar errores de tipo.
-      final cliente = Cliente(
-        nombre: _nombreController.text.trim(),
-        dni: _dniController.text.trim(),
-        direccion: _direccionController.text.trim(),
-        telefonoWhatsapp: _whatsappController.text.trim(),
-        correoElectronico: _correoController.text.trim(), // <-- puede ser ""
-        prestamos: [
-          Prestamo(
-            monto: double.tryParse(_montoController.text) ?? 0,
-            tasaInteresMensual: double.tryParse(_tasaController.text) ?? 0,
-            numeroCuotas: int.tryParse(_cuotasController.text) ?? 0,
-            tipoCuota: _tipoCuota,
-            fechaInicio: _convertirFecha(_fechaInicioController.text.trim()),
-            fechaCreacion: _convertirFecha(
-              _fechaCreacionController.text.trim(),
-            ),
-          ),
-        ],
+      final prestamo = Prestamo(
+        monto: double.tryParse(_montoController.text) ?? 0,
+        tasaInteresMensual: double.tryParse(_tasaController.text) ?? 0,
+        numeroCuotas: int.tryParse(_cuotasController.text) ?? 0,
+        tipoCuota: _tipoCuota,
+        fechaInicio: _convertirFecha(_fechaInicioController.text.trim()),
+        fechaCreacion: _convertirFecha(_fechaCreacionController.text.trim()),
       );
 
-      await _clienteService.crearCliente(cliente);
+      await _loanService.crearPrestamo(widget.clienteId, prestamo);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Cliente creado con éxito")),
+          const SnackBar(content: Text("Préstamo creado con éxito")),
         );
         Navigator.pop(context, true);
       }
@@ -118,23 +109,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Datos del Cliente",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    _buildTextField(_nombreController, "Nombre"),
-                    _buildTextField(_dniController, "DNI"),
-                    _buildTextField(_direccionController, "Dirección"),
-                    _buildTextField(_whatsappController, "WhatsApp"),
-                    // campo de correo opcional (si lo deja vacío se envía "")
-                    _buildEmailField(),
-                    const SizedBox(height: 20),
-
-                    const Text(
-                      "Préstamo Inicial",
+                      "Datos del Préstamo",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -150,9 +125,8 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
                             title: const Text("Mensual"),
                             value: "MENSUAL",
                             groupValue: _tipoCuota,
-                            onChanged: (value) {
-                              setState(() => _tipoCuota = value!);
-                            },
+                            onChanged: (value) =>
+                                setState(() => _tipoCuota = value!),
                           ),
                         ),
                         Expanded(
@@ -160,9 +134,8 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
                             title: const Text("Diario"),
                             value: "DIARIO",
                             groupValue: _tipoCuota,
-                            onChanged: (value) {
-                              setState(() => _tipoCuota = value!);
-                            },
+                            onChanged: (value) =>
+                                setState(() => _tipoCuota = value!),
                           ),
                         ),
                       ],
@@ -174,7 +147,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
                     ),
                     _buildTextField(
                       _tasaController,
-                      "Tasa de interés mensual",
+                      "Tasa de interés mensual (%)",
                       keyboard: TextInputType.number,
                     ),
                     _buildTextField(
@@ -183,7 +156,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
                       keyboard: TextInputType.number,
                     ),
 
-                    // Fecha de creación (picker)
+                    // Fecha de creación
                     GestureDetector(
                       onTap: () => _seleccionarFecha(_fechaCreacionController),
                       child: AbsorbPointer(
@@ -195,7 +168,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
                       ),
                     ),
 
-                    // Fecha de inicio (picker)
+                    // Fecha de inicio
                     GestureDetector(
                       onTap: () => _seleccionarFecha(_fechaInicioController),
                       child: AbsorbPointer(
@@ -220,7 +193,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: _guardarCliente,
+                        onPressed: _guardarPrestamo,
                         icon: const Icon(Icons.save, color: Colors.white),
                         label: const Text(
                           "Guardar",
@@ -235,7 +208,7 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
     );
   }
 
-  // Campo genérico reutilizable (por defecto required = true)
+  // Campo genérico
   Widget _buildTextField(
     TextEditingController controller,
     String label, {
@@ -257,34 +230,6 @@ class _ClienteFormPageState extends State<ClienteFormPage> {
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          filled: true,
-          fillColor: AppColors.surface,
-        ),
-      ),
-    );
-  }
-
-  // Campo de correo (opcional). Si se ingresa algo, valida formato.
-  Widget _buildEmailField() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: TextFormField(
-        controller: _correoController,
-        keyboardType: TextInputType.emailAddress,
-        validator: (value) {
-          if (value == null || value.trim().isEmpty) {
-            // opcional -> OK
-            return null;
-          }
-          final email = value.trim();
-          final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w+$');
-          if (!emailRegex.hasMatch(email)) return "Ingrese un correo válido";
-          return null;
-        },
-        decoration: InputDecoration(
-          labelText: "Correo Electrónico (opcional)",
-          hintText: "ejemplo@correo.com",
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           filled: true,
           fillColor: AppColors.surface,

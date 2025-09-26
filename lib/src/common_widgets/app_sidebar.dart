@@ -1,3 +1,4 @@
+import 'package:crediahorro/src/services/AuthService.dart';
 import 'package:flutter/material.dart';
 import 'package:crediahorro/src/routing/app_router.dart';
 import 'package:crediahorro/src/common_widgets/profile_avatar.dart';
@@ -31,14 +32,10 @@ class _AppSidebarState extends State<AppSidebar> {
 
   @override
   Widget build(BuildContext context) {
+    final AuthService _authService = AuthService();
     final items = [
-      _SidebarItem("Dashboard", Icons.dashboard_rounded, AppRouter.dashboard),
+      _SidebarItem("Home", Icons.dashboard_rounded, AppRouter.dashboard),
       _SidebarItem("Clientes", Icons.people_alt_rounded, AppRouter.clientes),
-      _SidebarItem(
-        "Préstamos",
-        Icons.account_balance_wallet_rounded,
-        AppRouter.prestamos,
-      ),
       _SidebarItem("Reportes", Icons.bar_chart_rounded, AppRouter.reportes),
       _SidebarItem(
         "Configuración",
@@ -55,8 +52,8 @@ class _AppSidebarState extends State<AppSidebar> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFF6D83F2), // Azul suave
-                Color(0xFF8A5DE8), // Morado elegante
+                Color.fromARGB(255, 233, 241, 246), // Azul suave
+                Color.fromARGB(255, 233, 241, 246), // Morado elegante
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -73,7 +70,7 @@ class _AppSidebarState extends State<AppSidebar> {
                   const Text(
                     "CrediAhorro",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
@@ -81,10 +78,7 @@ class _AppSidebarState extends State<AppSidebar> {
                   ),
                   IconButton(
                     onPressed: widget.onClose,
-                    icon: const Icon(
-                      Icons.close_rounded,
-                      color: Colors.white70,
-                    ),
+                    icon: const Icon(Icons.close_rounded, color: Colors.black),
                   ),
                 ],
               ),
@@ -99,8 +93,8 @@ class _AppSidebarState extends State<AppSidebar> {
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
                           colors: [
-                            Colors.white.withOpacity(0.15),
-                            Colors.white.withOpacity(0.05),
+                            Colors.black.withOpacity(0.15),
+                            Colors.black.withOpacity(0.05),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -129,7 +123,7 @@ class _AppSidebarState extends State<AppSidebar> {
                     Text(
                       _profileName ?? "",
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
                       ),
@@ -146,8 +140,8 @@ class _AppSidebarState extends State<AppSidebar> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.white.withOpacity(0.2),
-                      Colors.white.withOpacity(0.05),
+                      Colors.black.withOpacity(0.2),
+                      Colors.black.withOpacity(0.05),
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -167,10 +161,7 @@ class _AppSidebarState extends State<AppSidebar> {
                     height: 1,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [
-                          Colors.white.withOpacity(0.1),
-                          Colors.transparent,
-                        ],
+                        colors: [Colors.black.withOpacity(0.1), Colors.black],
                         begin: Alignment.centerLeft,
                         end: Alignment.centerRight,
                       ),
@@ -187,8 +178,8 @@ class _AppSidebarState extends State<AppSidebar> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.white.withOpacity(0.2),
-                      Colors.white.withOpacity(0.05),
+                      Colors.black.withOpacity(0.2),
+                      Colors.black.withOpacity(0.05),
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -197,16 +188,18 @@ class _AppSidebarState extends State<AppSidebar> {
               ),
               const SizedBox(height: 10),
               ListTile(
-                leading: const Icon(
-                  Icons.logout_rounded,
-                  color: Colors.white70,
-                ),
+                leading: const Icon(Icons.logout_rounded, color: Colors.black),
                 title: const Text(
                   "Cerrar sesión",
-                  style: TextStyle(color: Colors.white70, fontSize: 15),
+                  style: TextStyle(color: Colors.black, fontSize: 15),
                 ),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, AppRouter.login);
+                onTap: () async {
+                  await _authService.logout(); // limpia el token
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRouter.login,
+                    (route) => false, // elimina todas las rutas anteriores
+                  );
                 },
               ),
             ],
@@ -247,18 +240,18 @@ class _SidebarTileState extends State<_SidebarTile> {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
         decoration: BoxDecoration(
-          color: _hovered ? Colors.white.withOpacity(0.12) : Colors.transparent,
+          color: _hovered ? Colors.black.withOpacity(0.12) : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
         ),
         child: ListTile(
           leading: Icon(
             widget.item.icon,
-            color: _hovered ? Colors.white : Colors.white70,
+            color: _hovered ? Colors.black : Colors.black,
           ),
           title: Text(
             widget.item.title,
             style: TextStyle(
-              color: _hovered ? Colors.white : Colors.white70,
+              color: _hovered ? Colors.black : Colors.black,
               fontWeight: _hovered ? FontWeight.bold : FontWeight.w500,
               fontSize: 15.5,
             ),

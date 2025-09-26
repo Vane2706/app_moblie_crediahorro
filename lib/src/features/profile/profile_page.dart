@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crediahorro/src/common_widgets/profile_avatar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:crediahorro/src/layouts/app_scaffold.dart';
+import 'package:crediahorro/src/common_widgets/app_scaffold.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

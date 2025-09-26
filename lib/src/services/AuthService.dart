@@ -6,24 +6,36 @@ class AuthService {
   static const String _baseUrl =
       'https://gateway-production-7c45.up.railway.app/auth-service/auth';
 
-  // Login Method
+  // LOGIN
   Future<void> login(String username, String password) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'username': username, 'password': password}),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode({
+        'username': username.trim(),
+        'password': password.trim(),
+      }),
     );
 
     if (response.statusCode == 200) {
-      final token = jsonDecode(response.body)['accessToken'];
+      final body = jsonDecode(response.body);
+      final token = body['accessToken'];
+
+      if (token == null) {
+        throw Exception("Token no recibido: ${response.body}");
+      }
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('accessToken', token); // Guarda el token
+      await prefs.setString('accessToken', token);
     } else {
       throw Exception('Login failed: ${response.body}');
     }
   }
 
-  // Register Method
+  // REGISTER
   Future<void> register(
     String username,
     String password,
@@ -32,7 +44,10 @@ class AuthService {
   ) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/register'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
       body: jsonEncode({
         'username': username,
         'password': password,
@@ -46,13 +61,27 @@ class AuthService {
     }
   }
 
-  // Get Token
+  // VALIDAR TOKEN
+  Future<bool> validateToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken');
+    if (token == null) return false;
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/jwt'),
+      headers: {'Authorization': 'Bearer $token', 'Accept': 'application/json'},
+    );
+
+    return response.statusCode == 200;
+  }
+
+  // OBTENER TOKEN
   Future<String?> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');
   }
 
-  // Logout Method
+  // LOGOUT
   Future<void> logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove('accessToken');

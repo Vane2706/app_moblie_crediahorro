@@ -1,4 +1,4 @@
-import 'package:crediahorro/src/features/auth/register/RegisterBloc.dart';
+import 'package:crediahorro/src/features/auth/register/bloc/RegisterBloc.dart';
 import 'package:crediahorro/src/features/auth/register/RegisterContent.dart';
 import 'package:crediahorro/src/services/AuthService.dart';
 import 'package:flutter/material.dart';
@@ -9,13 +9,9 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocProvider(
-        create: (_) => RegisterBloc(AuthService()),
-        child: const Center(
-          child: SingleChildScrollView(child: RegisterContent()),
-        ),
-      ),
+    return BlocProvider(
+      create: (_) => RegisterBloc(AuthService()),
+      child: const Scaffold(body: RegisterContent()),
     );
   }
 }

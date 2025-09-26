@@ -2,6 +2,7 @@ import 'package:crediahorro/src/constants/app_colors.dart';
 import 'package:crediahorro/src/constants/app_text_styles.dart';
 import 'package:crediahorro/src/routing/app_router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(const CrediAhorroApp());
@@ -35,6 +36,17 @@ class CrediAhorroApp extends StatelessWidget {
           ),
         ),
       ),
+
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('es', 'ES'), // español
+        Locale('en', 'US'), // inglés (fallback)
+      ],
+
       initialRoute: AppRouter.login,
       onGenerateRoute: AppRouter.generateRoute,
     );

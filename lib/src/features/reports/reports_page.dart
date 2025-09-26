@@ -1,4 +1,4 @@
-import 'package:crediahorro/src/layouts/app_scaffold.dart';
+import 'package:crediahorro/src/common_widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:crediahorro/src/constants/app_colors.dart';
 import 'package:crediahorro/src/constants/app_text_styles.dart';

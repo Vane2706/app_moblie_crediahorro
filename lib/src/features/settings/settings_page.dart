@@ -1,4 +1,5 @@
-import 'package:crediahorro/src/layouts/app_scaffold.dart';
+import 'package:crediahorro/src/common_widgets/app_scaffold.dart';
+import 'package:crediahorro/src/services/AuthService.dart';
 import 'package:flutter/material.dart';
 import 'package:crediahorro/src/constants/app_colors.dart';
 import 'package:crediahorro/src/constants/app_text_styles.dart';
@@ -10,6 +11,7 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AuthService _authService = AuthService();
     final List<_SettingItem> items = [
       _SettingItem(
         title: "Perfil",
@@ -25,7 +27,14 @@ class SettingsPage extends StatelessWidget {
       _SettingItem(
         title: "Cerrar Sesión",
         icon: Icons.logout,
-        onTap: () => Navigator.pushNamed(context, AppRouter.login),
+        onTap: () async {
+          await _authService.logout(); // limpia el token
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRouter.login,
+            (route) => false, // elimina todas las rutas anteriores
+          );
+        },
       ),
     ];
 

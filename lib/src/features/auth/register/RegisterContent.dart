@@ -1,123 +1,224 @@
-import 'package:crediahorro/src/common_widgets/app_logo.dart';
-import 'package:crediahorro/src/domain/utils/Resource.dart';
-import 'package:crediahorro/src/features/auth/register/RegisterEvent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:crediahorro/src/features/auth/register/RegisterBloc.dart';
-import 'package:crediahorro/src/features/auth/register/RegisterState.dart';
-import 'package:crediahorro/src/constants/app_colors.dart';
-import 'package:crediahorro/src/constants/app_text_styles.dart';
-import 'package:crediahorro/src/common_widgets/custom_text_field.dart';
-import 'package:crediahorro/src/common_widgets/primary_button.dart';
+import 'package:crediahorro/src/domain/utils/Resource.dart';
+import 'package:crediahorro/src/features/auth/register/bloc/RegisterBloc.dart';
+import 'package:crediahorro/src/features/auth/register/bloc/RegisterEvent.dart';
+import 'package:crediahorro/src/features/auth/register/bloc/RegisterState.dart';
+import 'package:crediahorro/src/routing/app_router.dart';
 
-class RegisterContent extends StatelessWidget {
+class RegisterContent extends StatefulWidget {
   const RegisterContent({super.key});
 
   @override
+  State<RegisterContent> createState() => _RegisterContentState();
+}
+
+class _RegisterContentState extends State<RegisterContent> {
+  bool _obscurePassword = true;
+
+  @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegisterBloc, RegisterState>(
-      builder: (context, state) {
-        final status = state.status;
-
-        return Center(
-          child: SingleChildScrollView(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const AppLogo(size: 100),
-                  const SizedBox(height: 20),
-                  Text("Crear Cuenta", style: AppTextStyles.screenTitle),
-                  const SizedBox(height: 30),
-
-                  CustomTextField(
-                    label: "Usuario",
-                    hint: "Ingresa tu nombre de usuario",
-                    onChanged: (value) => context.read<RegisterBloc>().add(
-                      RegisterUsernameChanged(value),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  CustomTextField(
-                    label: "WhatsApp",
-                    hint: "Ingresa tu número de WhatsApp",
-                    keyboardType: TextInputType.phone,
-                    onChanged: (value) => context.read<RegisterBloc>().add(
-                      RegisterWhatsappChanged(value),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  CustomTextField(
-                    label: "Correo electrónico",
-                    hint: "Ingresa tu email",
-                    onChanged: (value) => context.read<RegisterBloc>().add(
-                      RegisterEmailChanged(value),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  CustomTextField(
-                    label: "Contraseña",
-                    hint: "Crea tu contraseña",
-                    isPassword: true,
-                    onChanged: (value) => context.read<RegisterBloc>().add(
-                      RegisterPasswordChanged(value),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-
-                  if (status?.status == Status.loading)
-                    const CircularProgressIndicator(color: AppColors.primary)
-                  else
-                    PrimaryButton(
-                      text: "Registrarme",
-                      onPressed: () {
-                        context.read<RegisterBloc>().add(
-                          const RegisterSubmitted(),
-                        );
-                      },
-                    ),
-
-                  const SizedBox(height: 20),
-
-                  if (status?.status == Status.error)
-                    Text(
-                      status?.message ?? "Error",
-                      style: const TextStyle(color: AppColors.error),
-                    ),
-                  if (status?.status == Status.success)
-                    const Text(
-                      "✅ Registro exitoso",
-                      style: TextStyle(color: AppColors.success),
-                    ),
-
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/');
-                    },
-                    child: const Text(
-                      "¿Ya tienes cuenta? Inicia sesión",
-                      style: TextStyle(color: AppColors.primary),
-                    ),
-                  ),
-                ],
+    return BlocListener<RegisterBloc, RegisterState>(
+      listener: (context, state) {
+        if (state.status?.status == Status.success) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text("Registro exitoso")));
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRouter.login,
+            (route) => false,
+          );
+        } else if (state.status?.status == Status.error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.status?.message ?? "Error")),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            // 👉 Fondo con imagen en lugar de las "bolas azules"
+            Positioned.fill(
+              child: Image.asset(
+                "assets/img/login.jpeg", // 👈 coloca aquí tu imagen
+                fit: BoxFit.cover,
               ),
             ),
+
+            // Contenido principal
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 60),
+
+                    // Título
+                    const Center(
+                      child: Text(
+                        "CREDIAHORRO",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // Campos + Botón Flecha
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildUserField(context),
+                              const SizedBox(height: 16),
+                              _buildWhatsappField(context),
+                              const SizedBox(height: 16),
+                              _buildEmailField(context),
+                              const SizedBox(height: 16),
+                              _buildPasswordField(context),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+                        _buildArrowButton(context),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Ir a login
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, AppRouter.login);
+                        },
+                        child: const Text(
+                          "¿Ya tienes cuenta? Inicia sesión",
+                          style: TextStyle(color: Color(0xFF0052CC)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Campos de entrada con mismo estilo que login
+  Widget _buildUserField(BuildContext context) {
+    return TextField(
+      decoration: _inputDecoration("Usuario", Icons.person),
+      onChanged: (value) =>
+          context.read<RegisterBloc>().add(RegisterUsernameChanged(value)),
+    );
+  }
+
+  Widget _buildWhatsappField(BuildContext context) {
+    return TextField(
+      keyboardType: TextInputType.phone,
+      decoration: _inputDecoration("WhatsApp", Icons.phone),
+      onChanged: (value) =>
+          context.read<RegisterBloc>().add(RegisterWhatsappChanged(value)),
+    );
+  }
+
+  Widget _buildEmailField(BuildContext context) {
+    return TextField(
+      decoration: _inputDecoration("Correo electrónico", Icons.email),
+      onChanged: (value) =>
+          context.read<RegisterBloc>().add(RegisterEmailChanged(value)),
+    );
+  }
+
+  Widget _buildPasswordField(BuildContext context) {
+    return TextField(
+      obscureText: _obscurePassword,
+      decoration: _inputDecoration("Contraseña", Icons.lock).copyWith(
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        ),
+      ),
+      onChanged: (value) =>
+          context.read<RegisterBloc>().add(RegisterPasswordChanged(value)),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint, IconData icon) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Colors.grey),
+      prefixIcon: Icon(icon, color: Colors.grey),
+      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+      border: const OutlineInputBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(0),
+          bottomLeft: Radius.circular(0),
+          topRight: Radius.circular(40),
+          bottomRight: Radius.circular(40),
+        ),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(0),
+          bottomLeft: Radius.circular(0),
+          topRight: Radius.circular(40),
+          bottomRight: Radius.circular(40),
+        ),
+        borderSide: BorderSide(color: Colors.black26),
+      ),
+    );
+  }
+
+  Widget _buildArrowButton(BuildContext context) {
+    return BlocBuilder<RegisterBloc, RegisterState>(
+      builder: (context, state) {
+        if (state.status?.status == Status.loading) {
+          return const SizedBox(
+            width: 56,
+            height: 56,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.blue,
+            ),
+          );
+        }
+        return InkWell(
+          onTap: () {
+            context.read<RegisterBloc>().add(const RegisterSubmitted());
+          },
+          borderRadius: BorderRadius.circular(50),
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFF0052CC),
+            ),
+            child: const Icon(Icons.arrow_forward, color: Colors.white),
           ),
         );
       },

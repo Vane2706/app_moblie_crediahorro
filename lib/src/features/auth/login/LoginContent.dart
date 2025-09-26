@@ -1,113 +1,226 @@
-import 'package:crediahorro/src/domain/utils/Resource.dart';
-import 'package:crediahorro/src/features/auth/login/LoginEvent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:crediahorro/src/features/auth/login/LoginBloc.dart';
-import 'package:crediahorro/src/features/auth/login/LoginState.dart';
-import 'package:crediahorro/src/constants/app_colors.dart';
-import 'package:crediahorro/src/constants/app_text_styles.dart';
-import 'package:crediahorro/src/common_widgets/custom_text_field.dart';
-import 'package:crediahorro/src/common_widgets/primary_button.dart';
+import 'package:crediahorro/src/domain/utils/Resource.dart';
+import 'package:crediahorro/src/features/auth/login/bloc/LoginBloc.dart';
+import 'package:crediahorro/src/features/auth/login/bloc/LoginEvent.dart';
+import 'package:crediahorro/src/features/auth/login/bloc/LoginState.dart';
+import 'package:crediahorro/src/routing/app_router.dart';
 
-class LoginContent extends StatelessWidget {
+class LoginContent extends StatefulWidget {
   const LoginContent({super.key});
+
+  @override
+  State<LoginContent> createState() => _LoginContentState();
+}
+
+class _LoginContentState extends State<LoginContent> {
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<LoginBloc, LoginState>(
       listener: (context, state) {
-        // Verifica si el estado ha cambiado a éxito o error
         if (state.status != null) {
           if (state.status!.status == Status.success) {
-            Navigator.pushReplacementNamed(
+            Navigator.pushNamedAndRemoveUntil(
               context,
-              '/dashboard', // Redirige si el login es exitoso
+              AppRouter.dashboard,
+              (route) => false,
             );
           } else if (state.status!.status == Status.error) {
-            // Muestra un error si las credenciales son incorrectas
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.status!.message ?? 'Error')),
             );
           }
         }
       },
-      child: BlocBuilder<LoginBloc, LoginState>(
-        builder: (context, state) {
-          return Center(
-            child: SingleChildScrollView(
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                    "assets/img/login.jpeg",
+                  ), // 👈 coloca aquí tu imagen
+                  fit: BoxFit.cover,
                 ),
+              ),
+            ),
+
+            // Contenido principal
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Bienvenido a CrediAhorro",
-                      style: AppTextStyles.screenTitle,
-                    ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 60),
 
-                    // Campo para el usuario
-                    CustomTextField(
-                      label: "Usuario",
-                      hint: "Ingresa tu usuario",
-                      onChanged: (value) {
-                        context.read<LoginBloc>().add(
-                          LoginUsernameChanged(
-                            value,
-                          ), // Evento para cambiar el usuario
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Campo para la contraseña
-                    CustomTextField(
-                      label: "Contraseña",
-                      hint: "Ingresa tu contraseña",
-                      isPassword: true,
-                      onChanged: (value) {
-                        context.read<LoginBloc>().add(
-                          LoginPasswordChanged(
-                            value,
-                          ), // Evento para cambiar la contraseña
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 30),
-
-                    // Botón para ingresar
-                    if (state.status?.status == Status.loading)
-                      const CircularProgressIndicator(color: AppColors.primary)
-                    else
-                      PrimaryButton(
-                        text: "Ingresar",
-                        onPressed: () {
-                          context.read<LoginBloc>().add(
-                            const LoginSubmitted(),
-                          ); // Enviar evento de login
-                        },
+                    // Título
+                    const Center(
+                      child: Text(
+                        "CREDIAHORRO",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          letterSpacing: 1.2,
+                        ),
                       ),
+                    ),
+
+                    const SizedBox(height: 60),
+
+                    // Sección con los dos campos y el botón al lado derecho
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Campos (Usuario y Contraseña)
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildUserField(context),
+                              const SizedBox(height: 20),
+                              _buildPasswordField(context),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        // Botón Flecha
+                        _buildArrowButton(context),
+                      ],
+                    ),
 
                     const SizedBox(height: 20),
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, AppRouter.register);
+                        },
+                        child: const Text(
+                          "¿No tienes cuenta? Regístrate aquí",
+                          style: TextStyle(color: Color(0xFF0052CC)),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildUserField(BuildContext context) {
+    return TextField(
+      decoration: InputDecoration(
+        hintText: "Usuario",
+        hintStyle: const TextStyle(color: Colors.grey),
+        prefixIcon: const Icon(Icons.person, color: Colors.grey),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16),
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(0),
+            bottomLeft: Radius.circular(0),
+            topRight: Radius.circular(40),
+            bottomRight: Radius.circular(40),
+          ),
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(0),
+            bottomLeft: Radius.circular(0),
+            topRight: Radius.circular(40),
+            bottomRight: Radius.circular(40),
+          ),
+          borderSide: BorderSide(color: Colors.black26),
+        ),
+      ),
+      onChanged: (value) {
+        context.read<LoginBloc>().add(LoginUsernameChanged(value));
+      },
+    );
+  }
+
+  Widget _buildPasswordField(BuildContext context) {
+    return TextField(
+      obscureText: _obscurePassword,
+      decoration: InputDecoration(
+        hintText: "*************",
+        hintStyle: const TextStyle(color: Colors.grey),
+        prefixIcon: const Icon(Icons.lock, color: Colors.grey),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16),
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(0),
+            bottomLeft: Radius.circular(0),
+            topRight: Radius.circular(40),
+            bottomRight: Radius.circular(40),
+          ),
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(0),
+            bottomLeft: Radius.circular(0),
+            topRight: Radius.circular(40),
+            bottomRight: Radius.circular(40),
+          ),
+          borderSide: BorderSide(color: Colors.black26),
+        ),
+      ),
+      onChanged: (value) {
+        context.read<LoginBloc>().add(LoginPasswordChanged(value));
+      },
+    );
+  }
+
+  Widget _buildArrowButton(BuildContext context) {
+    return BlocBuilder<LoginBloc, LoginState>(
+      builder: (context, state) {
+        if (state.status?.status == Status.loading) {
+          return const SizedBox(
+            width: 56,
+            height: 56,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: Colors.blue,
+            ),
+          );
+        }
+        return InkWell(
+          onTap: () {
+            context.read<LoginBloc>().add(const LoginSubmitted());
+          },
+          borderRadius: BorderRadius.circular(50),
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFF0052CC),
+            ),
+            child: const Icon(Icons.arrow_forward, color: Colors.white),
+          ),
+        );
+      },
     );
   }
 }

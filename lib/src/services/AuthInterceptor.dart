@@ -11,7 +11,11 @@ class AuthInterceptor extends http.BaseClient {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken');
 
-    if (token != null) {
+    // Headers obligatorios
+    request.headers['Accept'] = 'application/json';
+    request.headers['Content-Type'] = 'application/json';
+
+    if (token != null && token.isNotEmpty) {
       request.headers['Authorization'] = 'Bearer $token';
     }
 
