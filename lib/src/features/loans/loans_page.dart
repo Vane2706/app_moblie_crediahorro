@@ -1,6 +1,7 @@
 import 'package:crediahorro/src/features/clients/models/cliente.dart';
 import 'package:crediahorro/src/features/loans/loan_edit_page.dart';
 import 'package:crediahorro/src/features/loans/loan_form_page.dart';
+import 'package:crediahorro/src/routing/app_router.dart';
 import 'package:crediahorro/src/services/cliente_service.dart';
 import 'package:crediahorro/src/common_widgets/app_scaffold.dart';
 import 'package:crediahorro/src/constants/app_colors.dart';
@@ -59,7 +60,11 @@ class _LoansPageState extends State<LoansPage> {
               title: const Text("Ver Cuotas"),
               onTap: () {
                 Navigator.pop(context);
-                // 👉 Navegar a cuotas
+                Navigator.pushNamed(
+                  context,
+                  AppRouter.cuotas,
+                  arguments: prestamo.id,
+                );
               },
             ),
             if (prestamo.estado != "PAGADO")

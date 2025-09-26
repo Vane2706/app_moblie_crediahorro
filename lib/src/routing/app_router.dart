@@ -3,6 +3,7 @@ import 'package:crediahorro/src/features/auth/register/RegisterPage.dart';
 import 'package:crediahorro/src/features/clients/client_form_page.dart';
 import 'package:crediahorro/src/features/clients/cliente_edit_page.dart';
 import 'package:crediahorro/src/features/clients/clients_page.dart';
+import 'package:crediahorro/src/features/cuotas/cuotas_page.dart';
 import 'package:crediahorro/src/features/dashboard/dashboard_screen.dart';
 import 'package:crediahorro/src/features/loans/loans_page.dart';
 import 'package:crediahorro/src/features/loans/loan_form_page.dart';
@@ -20,6 +21,7 @@ class AppRouter {
   static const String prestamos = '/prestamos';
   static const String prestamoNuevo = '/prestamo-nuevo';
   static const String prestamoEditar = '/prestamo-editar';
+  static const String cuotas = '/cuotas';
   static const String reportes = '/reportes';
   static const String configuracion = '/configuracion';
   static const String clienteForm = '/cliente-form';
@@ -40,6 +42,11 @@ class AppRouter {
         final clienteId = settings.arguments as int;
         return MaterialPageRoute(
           builder: (_) => LoansPage(clienteId: clienteId),
+        );
+      case cuotas:
+        final prestamoId = settings.arguments as int;
+        return MaterialPageRoute(
+          builder: (_) => CuotasPage(prestamoId: prestamoId),
         );
       case prestamoNuevo:
         final clienteId = settings.arguments as int;
