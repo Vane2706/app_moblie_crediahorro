@@ -95,13 +95,13 @@ class _AppScaffoldState extends State<AppScaffold> {
               ),
             ),
             child: BottomNavigationBar(
-              backgroundColor: Colors.white,
+              backgroundColor: AppColors.surface,
               elevation: 0,
               currentIndex: _selectedIndex,
               onTap: _onNavTapped,
               type: BottomNavigationBarType.fixed,
               selectedItemColor: AppColors.primary,
-              unselectedItemColor: Colors.grey,
+              unselectedItemColor: AppColors.grey,
               selectedLabelStyle: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.bold,

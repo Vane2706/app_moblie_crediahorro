@@ -14,16 +14,25 @@ class ClientsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => ClientsBloc(ClienteService())..add(LoadClients()),
-      child: AppScaffold(
-        title: "CREDIAHORRO",
-        body: ClientsContent(),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            Navigator.pushNamed(context, AppRouter.clienteForm);
-          },
-          backgroundColor: Colors.white,
-          icon: const Icon(Icons.add, color: Colors.black),
-          label: const Text("Agregar", style: TextStyle(color: Colors.black)),
+      child: Builder(
+        builder: (context) => AppScaffold(
+          title: "CREDIAHORRO",
+          body: ClientsContent(),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () async {
+              final result = await Navigator.pushNamed(
+                context,
+                AppRouter.clienteForm,
+              );
+
+              if (result == true && context.mounted) {
+                context.read<ClientsBloc>().add(LoadClients());
+              }
+            },
+            backgroundColor: Colors.white,
+            icon: const Icon(Icons.add, color: Colors.black),
+            label: const Text("Agregar", style: TextStyle(color: Colors.black)),
+          ),
         ),
       ),
     );

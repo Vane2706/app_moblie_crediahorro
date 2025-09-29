@@ -9,6 +9,7 @@ class AppColors {
   static const Color accent = Color(0xFFFBC02D);
   static const Color transparent = Colors.transparent;
   static const Color black = Colors.black;
+  static const Color grey = Colors.grey;
 
   // --- Colores de Branding ---
   static const Color lightBlue = Color(0xFF5472D3);

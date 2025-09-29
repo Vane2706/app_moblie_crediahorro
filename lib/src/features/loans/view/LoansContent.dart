@@ -58,7 +58,7 @@ class LoansContent extends StatelessWidget {
                 title: const Text("Editar Préstamo"),
                 onTap: () async {
                   Navigator.pop(context);
-                  await Navigator.push(
+                  final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => LoanEditPage(
@@ -67,9 +67,12 @@ class LoansContent extends StatelessWidget {
                       ),
                     ),
                   );
-                  context.read<LoansBloc>().add(const LoansReloaded());
+                  if (result == true && context.mounted) {
+                    context.read<LoansBloc>().add(LoansLoaded(clienteId));
+                  }
                 },
               ),
+
             if (prestamo.estado == "PAGADO")
               ListTile(
                 leading: const Icon(Icons.file_present, color: Colors.green),

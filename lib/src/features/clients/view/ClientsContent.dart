@@ -123,13 +123,16 @@ class ClientsContent extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.edit, color: AppColors.primary),
               title: const Text("Editar Cliente"),
-              onTap: () {
+              onTap: () async {
                 Navigator.pop(context);
-                Navigator.pushNamed(
+                final result = await Navigator.pushNamed(
                   context,
                   AppRouter.clienteEdit,
                   arguments: cliente.id,
                 );
+                if (result == true && context.mounted) {
+                  context.read<ClientsBloc>().add(LoadClients());
+                }
               },
             ),
             ListTile(

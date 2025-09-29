@@ -56,10 +56,10 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
             hoyList.add(cliente);
             break;
           } else if (diferencia > 0 && diferencia <= 3) {
-            anteriores.add(cliente);
+            proximos.add(cliente);
             break;
           } else if (fechaPago.isBefore(hoyDate)) {
-            proximos.add(cliente);
+            anteriores.add(cliente);
             break;
           }
         }
