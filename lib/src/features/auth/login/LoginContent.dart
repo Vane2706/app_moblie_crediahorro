@@ -10,11 +10,11 @@ class LoginContent extends StatefulWidget {
   const LoginContent({super.key});
 
   @override
-  State<LoginContent> createState() => _LoginContentState();
+  State<LoginContent> createState() => _LoginContentState(); //muestra contenido
 }
 
 class _LoginContentState extends State<LoginContent> {
-  bool _obscurePassword = true;
+  bool _obscurePassword = true; //ojito de contraseña
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class _LoginContentState extends State<LoginContent> {
             Navigator.pushNamedAndRemoveUntil(
               context,
               AppRouter.dashboard,
-              (route) => false,
+              (route) => false, //borra la ruta anterior
             );
           } else if (state.status!.status == Status.error) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -40,15 +40,11 @@ class _LoginContentState extends State<LoginContent> {
             Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(
-                    "assets/img/login.jpeg",
-                  ), // 👈 coloca aquí tu imagen
+                  image: AssetImage("assets/img/login.jpeg"),
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-
-            // Contenido principal
             Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -58,7 +54,6 @@ class _LoginContentState extends State<LoginContent> {
                   children: [
                     const SizedBox(height: 60),
 
-                    // Título
                     const Center(
                       child: Text(
                         "CREDIAHORRO",
@@ -72,12 +67,9 @@ class _LoginContentState extends State<LoginContent> {
                     ),
 
                     const SizedBox(height: 60),
-
-                    // Sección con los dos campos y el botón al lado derecho
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Campos (Usuario y Contraseña)
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,7 +83,6 @@ class _LoginContentState extends State<LoginContent> {
 
                         const SizedBox(width: 12),
 
-                        // Botón Flecha
                         _buildArrowButton(context),
                       ],
                     ),

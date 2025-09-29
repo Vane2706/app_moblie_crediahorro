@@ -11,7 +11,7 @@ class ProfileAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap, // para permitir editar si se necesita
+      onTap: onTap,
       child: CircleAvatar(
         radius: size / 2,
         backgroundColor: Colors.white,

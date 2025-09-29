@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+//envia token
 class AuthInterceptor extends http.BaseClient {
   final http.Client _client;
 
@@ -10,8 +11,6 @@ class AuthInterceptor extends http.BaseClient {
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken');
-
-    // Headers obligatorios
     request.headers['Accept'] = 'application/json';
     request.headers['Content-Type'] = 'application/json';
 

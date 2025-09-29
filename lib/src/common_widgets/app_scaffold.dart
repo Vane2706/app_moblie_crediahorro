@@ -30,6 +30,7 @@ class _AppScaffoldState extends State<AppScaffold> {
     });
   }
 
+  //barra de navegación inferior
   void _onNavTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -60,17 +61,17 @@ class _AppScaffoldState extends State<AppScaffold> {
       children: [
         Scaffold(
           appBar: AppBar(
+            //heater xddddd
             title: Text(
               widget.title,
               style: AppTextStyles.screenTitle.copyWith(color: AppColors.black),
             ),
             centerTitle: true,
-            backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.menu, color: AppColors.secondary),
               onPressed: _toggleSidebar,
-            ),
+            ), //botoncito 3 -
             flexibleSpace: Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
@@ -84,25 +85,22 @@ class _AppScaffoldState extends State<AppScaffold> {
           body: widget.body,
 
           floatingActionButton: widget.floatingActionButton,
-
-          // 🔽 Barra de navegación inferior personalizada
           bottomNavigationBar: Container(
             decoration: const BoxDecoration(
-              color: Colors.white, // fondo blanco
               border: Border(
                 top: BorderSide(
-                  color: Colors.black, // línea negra arriba
+                  color: Color.fromARGB(255, 113, 108, 108), //linea de abjo
                   width: 1,
                 ),
               ),
             ),
             child: BottomNavigationBar(
               backgroundColor: Colors.white,
-              elevation: 0, // sin sombra, ya tenemos la línea
+              elevation: 0,
               currentIndex: _selectedIndex,
               onTap: _onNavTapped,
               type: BottomNavigationBarType.fixed,
-              selectedItemColor: Colors.black,
+              selectedItemColor: AppColors.primary,
               unselectedItemColor: Colors.grey,
               selectedLabelStyle: const TextStyle(
                 fontSize: 13,

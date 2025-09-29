@@ -1,7 +1,7 @@
 import 'package:crediahorro/src/services/AuthService.dart';
 import 'package:flutter/material.dart';
 import 'package:crediahorro/src/routing/app_router.dart';
-import 'app_logo.dart'; // Asegúrate de importar tu AppLogo
+import 'app_logo.dart';
 
 class AppSidebar extends StatefulWidget {
   final VoidCallback onClose;
@@ -15,9 +15,9 @@ class _AppSidebarState extends State<AppSidebar> {
   @override
   Widget build(BuildContext context) {
     final AuthService _authService = AuthService();
-
+    //vienen de router
     final items = [
-      _SidebarItem("Home", Icons.dashboard_rounded, AppRouter.dashboard),
+      _SidebarItem("home", Icons.dashboard_rounded, AppRouter.dashboard),
       _SidebarItem("Clientes", Icons.people_alt_rounded, AppRouter.clientes),
       _SidebarItem("Reportes", Icons.bar_chart_rounded, AppRouter.reportes),
       _SidebarItem(
@@ -36,7 +36,7 @@ class _AppSidebarState extends State<AppSidebar> {
             gradient: LinearGradient(
               colors: [
                 Color.fromARGB(255, 233, 241, 246),
-                Color.fromARGB(255, 233, 241, 246),
+                Color.fromARGB(255, 129, 188, 224),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -46,7 +46,6 @@ class _AppSidebarState extends State<AppSidebar> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Encabezado con logo + botón cerrar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -61,13 +60,15 @@ class _AppSidebarState extends State<AppSidebar> {
                   ),
                   IconButton(
                     onPressed: widget.onClose,
-                    icon: const Icon(Icons.close_rounded, color: Colors.black),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: Color.fromARGB(255, 0, 0, 0),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 25),
 
-              // Logo centrado y dinámico
               Center(
                 child: Column(
                   children: [
@@ -84,7 +85,7 @@ class _AppSidebarState extends State<AppSidebar> {
                         ),
                       ),
                       padding: const EdgeInsets.all(8),
-                      child: const AppLogo(size: 100), // Aquí se usa el logo
+                      child: const AppLogo(size: 100),
                     ),
                     const SizedBox(height: 15),
                     const Text(
@@ -100,7 +101,6 @@ class _AppSidebarState extends State<AppSidebar> {
                 ),
               ),
 
-              // Divisor elegante
               Container(
                 height: 1,
                 margin: const EdgeInsets.only(bottom: 20),
@@ -116,7 +116,6 @@ class _AppSidebarState extends State<AppSidebar> {
                 ),
               ),
 
-              // Opciones con animación al hover
               Expanded(
                 child: ListView.separated(
                   itemBuilder: (_, index) {
@@ -138,7 +137,6 @@ class _AppSidebarState extends State<AppSidebar> {
                 ),
               ),
 
-              // Divider antes del logout
               const SizedBox(height: 16),
               Container(
                 height: 1,

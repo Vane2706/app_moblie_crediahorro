@@ -1,50 +1,15 @@
-import 'package:crediahorro/src/common_widgets/app_scaffold.dart';
-import 'package:crediahorro/src/constants/app_colors.dart';
+import 'package:crediahorro/src/features/cuotas/bloc/CuotasBloc.dart';
+import 'package:crediahorro/src/features/cuotas/bloc/CuotasEvent.dart';
+import 'package:crediahorro/src/features/cuotas/bloc/CuotasState.dart';
 import 'package:crediahorro/src/features/cuotas/models/cuota.dart';
-import 'package:crediahorro/src/services/cuota_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:crediahorro/src/constants/app_colors.dart';
 import 'package:intl/intl.dart';
 
-class CuotasPage extends StatefulWidget {
+class CuotasContent extends StatelessWidget {
   final int prestamoId;
-
-  const CuotasPage({super.key, required this.prestamoId});
-
-  @override
-  State<CuotasPage> createState() => _CuotasPageState();
-}
-
-class _CuotasPageState extends State<CuotasPage> {
-  final CuotaService _service = CuotaService();
-  late Future<PrestamoCuotasResponse> _future;
-
-  int cuotasPendientes = 0;
-  double totalAPagar = 0;
-  double totalPagado = 0;
-  double faltaPagar = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _future = _service.getCuotasByPrestamo(widget.prestamoId);
-  }
-
-  Future<void> _refresh() async {
-    setState(() {
-      _future = _service.getCuotasByPrestamo(widget.prestamoId);
-    });
-  }
-
-  void _calcularTotales(List<Cuota> cuotas) {
-    totalAPagar = cuotas.fold(0, (s, c) => s + c.montoCuota);
-    totalPagado = cuotas
-        .where((c) => c.estado == "PAGADA")
-        .fold(0, (s, c) => s + c.montoCuota);
-    faltaPagar = cuotas
-        .where((c) => c.estado == "PENDIENTE")
-        .fold(0, (s, c) => s + c.montoCuota);
-    cuotasPendientes = cuotas.where((c) => c.estado == "PENDIENTE").length;
-  }
+  const CuotasContent({super.key, required this.prestamoId});
 
   String _formatCurrency(double value) {
     return NumberFormat.currency(symbol: 'S/', locale: 'es_PE').format(value);
@@ -58,102 +23,6 @@ class _CuotasPageState extends State<CuotasPage> {
     } catch (_) {
       return fecha;
     }
-  }
-
-  void _mostrarAccionesCuota(Cuota cuota, bool habilitarPagar) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Wrap(
-          children: [
-            if (cuota.estado == "PENDIENTE") ...[
-              ListTile(
-                leading: const Icon(Icons.payment, color: Colors.green),
-                title: const Text("Pagar"),
-                onTap: habilitarPagar
-                    ? () async {
-                        Navigator.pop(context);
-                        await _service.pagarCuota(cuota.id);
-                        _refresh();
-                      }
-                    : null,
-              ),
-              ListTile(
-                leading: const Icon(Icons.cancel, color: Colors.red),
-                title: const Text("No pagar"),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await _service.marcarCuotaNoPagada(cuota.id);
-                  _refresh();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.money_off, color: Colors.blue),
-                title: const Text("Pago Parcial"),
-                onTap: () {
-                  Navigator.pop(context);
-                  _mostrarDialogoPagoParcial(cuota);
-                },
-              ),
-            ],
-            if (cuota.estado != "PENDIENTE")
-              ListTile(
-                leading: const Icon(Icons.info, color: Colors.grey),
-                title: const Text("Esta cuota ya fue gestionada"),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _mostrarDialogoPagoParcial(Cuota c) async {
-    final controller = TextEditingController();
-    final monto = await showDialog<double>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Pago Parcial"),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: "Ingrese el monto"),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
-          ),
-          TextButton(
-            onPressed: () {
-              final val = double.tryParse(controller.text);
-              if (val != null && val > 0) {
-                Navigator.pop(context, val);
-              }
-            },
-            child: const Text("Aceptar"),
-          ),
-        ],
-      ),
-    );
-
-    if (monto != null) {
-      await _service.pagarCuotaParcial(c.id, monto);
-      _refresh();
-    }
-  }
-
-  bool _esPagarHabilitado(List<Cuota> cuotas, int i) {
-    final cuota = cuotas[i];
-    if (cuota.estado != "PENDIENTE") return false;
-    if (i == 0) return true;
-    final anterior = cuotas[i - 1];
-    return anterior.estado == "PAGADA" ||
-        anterior.estado == "ADELANTADO" ||
-        anterior.tipoPago == "PAGO_INCOMPLETO";
   }
 
   Color _estadoColor(String? estado) {
@@ -171,33 +40,209 @@ class _CuotasPageState extends State<CuotasPage> {
     }
   }
 
+  bool _esPagarHabilitado(List<Cuota> cuotas, int i) {
+    final cuota = cuotas[i];
+    if (cuota.estado != "PENDIENTE") return false;
+    if (i == 0) return true;
+    final anterior = cuotas[i - 1];
+    return anterior.estado == "PAGADA" ||
+        anterior.estado == "ADELANTADO" ||
+        anterior.tipoPago == "PAGO_INCOMPLETO";
+  }
+
+  void _mostrarAccionesCuota(
+    BuildContext context,
+    Cuota cuota,
+    bool habilitarPagar,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Wrap(
+          children: [
+            if (cuota.estado == "PENDIENTE") ...[
+              ListTile(
+                leading: const Icon(Icons.payment, color: Colors.green),
+                title: const Text("Pagar"),
+                onTap: habilitarPagar
+                    ? () {
+                        Navigator.pop(context);
+                        context.read<CuotasBloc>().add(PagarCuota(cuota.id));
+                        context.read<CuotasBloc>().add(
+                          RefreshCuotas(prestamoId),
+                        );
+                      }
+                    : null,
+              ),
+              ListTile(
+                leading: const Icon(Icons.cancel, color: Colors.red),
+                title: const Text("No pagar"),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.read<CuotasBloc>().add(NoPagarCuota(cuota.id));
+                  context.read<CuotasBloc>().add(RefreshCuotas(prestamoId));
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.money_off, color: Colors.blue),
+                title: const Text("Pago Parcial"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _mostrarDialogoPagoParcial(context, cuota);
+                },
+              ),
+            ],
+            if (cuota.estado != "PENDIENTE")
+              ListTile(
+                leading: const Icon(Icons.info, color: Colors.grey),
+                title: const Text("Esta cuota ya fue gestionada"),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _mostrarDialogoPagoParcial(
+    BuildContext context,
+    Cuota cuota,
+  ) async {
+    final controller = TextEditingController();
+    final monto = await showDialog<double>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.payment, color: Colors.indigo, size: 28),
+            SizedBox(width: 10),
+            Text(
+              "Pago Parcial",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.indigo,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Ingrese el monto que desea abonar:",
+              style: TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              decoration: InputDecoration(
+                hintText: "Ej. 150.00",
+                prefixIcon: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  child: const Text(
+                    "S/",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.indigo,
+                    ),
+                  ),
+                ),
+                filled: true,
+                fillColor: Colors.indigo.shade50,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actions: [
+          ElevatedButton.icon(
+            onPressed: () {
+              final val = double.tryParse(controller.text);
+              if (val != null && val > 0) {
+                Navigator.pop(context, val);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 6, 35, 201),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            icon: const Icon(Icons.check, color: Colors.white),
+            label: const Text(
+              "Aceptar",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (monto != null) {
+      context.read<CuotasBloc>().add(PagoParcialCuota(cuota.id, monto));
+      context.read<CuotasBloc>().add(RefreshCuotas(prestamoId));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-      title: "CREDIAHORRO",
-      body: FutureBuilder<PrestamoCuotasResponse>(
-        future: _future,
-        builder: (ctx, snap) {
-          if (snap.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snap.hasError) {
-            return Center(child: Text("Error: ${snap.error}"));
-          }
+    return BlocBuilder<CuotasBloc, CuotasState>(
+      builder: (context, state) {
+        if (state is CuotasLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is CuotasError) {
+          return Center(child: Text(state.message));
+        } else if (state is CuotasLoaded) {
+          final cuotas = state.data.cuotas;
 
-          final data = snap.data!;
-          final cuotas = data.cuotas;
-          _calcularTotales(cuotas);
+          // Calcular totales
+          final totalAPagar = cuotas.fold(0.0, (s, c) => s + c.montoCuota);
+          final totalPagado = cuotas
+              .where((c) => c.estado == "PAGADA")
+              .fold(0.0, (s, c) => s + c.montoCuota);
+          final faltaPagar = cuotas
+              .where((c) => c.estado == "PENDIENTE")
+              .fold(0.0, (s, c) => s + c.montoCuota);
+          final cuotasPendientes = cuotas
+              .where((c) => c.estado == "PENDIENTE")
+              .length;
 
           return RefreshIndicator(
-            onRefresh: _refresh,
+            onRefresh: () async {
+              context.read<CuotasBloc>().add(RefreshCuotas(prestamoId));
+            },
             child: ListView(
               padding: const EdgeInsets.all(12),
               children: [
                 Card(
                   color: Colors.indigo.shade50,
                   child: ListTile(
-                    title: Text("Tipo de Cuota: ${data.tipoCuota ?? "-"}"),
+                    title: Text(
+                      "Tipo de Cuota: ${state.data.tipoCuota ?? "-"}",
+                    ),
                     subtitle: Text("Cuotas pendientes: $cuotasPendientes"),
                   ),
                 ),
@@ -216,6 +261,7 @@ class _CuotasPageState extends State<CuotasPage> {
                     ),
                     child: ListTile(
                       onTap: () => _mostrarAccionesCuota(
+                        context,
                         c,
                         _esPagarHabilitado(cuotas, i),
                       ),
@@ -273,8 +319,9 @@ class _CuotasPageState extends State<CuotasPage> {
               ],
             ),
           );
-        },
-      ),
+        }
+        return const SizedBox();
+      },
     );
   }
 }

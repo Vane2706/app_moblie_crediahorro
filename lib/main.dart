@@ -44,7 +44,7 @@ class CrediAhorroApp extends StatelessWidget {
       ],
       supportedLocales: const [
         Locale('es', 'ES'), // español
-        Locale('en', 'US'), // inglés (fallback)
+        Locale('en', 'US'), // inglés
       ],
 
       initialRoute: AppRouter.login,

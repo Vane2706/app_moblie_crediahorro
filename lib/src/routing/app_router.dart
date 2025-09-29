@@ -1,13 +1,13 @@
 import 'package:crediahorro/src/features/auth/login/LoginPage.dart';
 import 'package:crediahorro/src/features/auth/register/RegisterPage.dart';
-import 'package:crediahorro/src/features/clients/client_form_page.dart';
-import 'package:crediahorro/src/features/clients/cliente_edit_page.dart';
-import 'package:crediahorro/src/features/clients/clients_page.dart';
-import 'package:crediahorro/src/features/cuotas/cuotas_page.dart';
-import 'package:crediahorro/src/features/dashboard/dashboard_screen.dart';
-import 'package:crediahorro/src/features/loans/loans_page.dart';
-import 'package:crediahorro/src/features/loans/loan_form_page.dart';
-import 'package:crediahorro/src/features/loans/loan_edit_page.dart';
+import 'package:crediahorro/src/features/clients/create/ClienteFormPage.dart';
+import 'package:crediahorro/src/features/clients/edit/ClienteEditPage.dart';
+import 'package:crediahorro/src/features/clients/view/ClientsPage.dart';
+import 'package:crediahorro/src/features/cuotas/CuotasPage.dart';
+import 'package:crediahorro/src/features/dashboard/DashboardPage.dart';
+import 'package:crediahorro/src/features/loans/create/LoanFormPage.dart';
+import 'package:crediahorro/src/features/loans/edit/LoanEditPage.dart';
+import 'package:crediahorro/src/features/loans/view/LoansPage.dart';
 import 'package:crediahorro/src/features/profile/profile_overview_page.dart';
 import 'package:crediahorro/src/features/profile/profile_page.dart';
 import 'package:crediahorro/src/features/reports/reports_page.dart';
@@ -37,7 +37,7 @@ class AppRouter {
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterPage());
       case dashboard:
-        return MaterialPageRoute(builder: (_) => const DashboardScreen());
+        return MaterialPageRoute(builder: (_) => const DashboardPage());
       case clientes:
         return MaterialPageRoute(builder: (_) => const ClientsPage());
       case prestamos:

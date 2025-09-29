@@ -70,14 +70,13 @@ class _ProfilePageState extends State<ProfilePage> {
     final displayImage = _tempImagePath ?? _savedImagePath;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF4C3A3A), // marrón oscuro
+      backgroundColor: const Color(0xFF4C3A3A),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 🔙 Botón regresar
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => Navigator.pop(context),
@@ -182,7 +181,7 @@ class _ProfilePageState extends State<ProfilePage> {
         labelText: label,
         labelStyle: const TextStyle(color: Colors.white70),
         filled: true,
-        fillColor: const Color(0xFF2E2A2A), // fondo oscuro
+        fillColor: const Color(0xFF2E2A2A),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

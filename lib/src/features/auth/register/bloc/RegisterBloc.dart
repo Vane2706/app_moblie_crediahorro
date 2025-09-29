@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crediahorro/src/domain/utils/Resource.dart';
 import 'package:crediahorro/src/features/auth/register/bloc/RegisterEvent.dart';
 import 'package:crediahorro/src/features/auth/register/bloc/RegisterState.dart';
-import 'package:crediahorro/src/services/AuthService.dart'; // Asegúrate de que el servicio AuthService sea correcto
+import 'package:crediahorro/src/services/AuthService.dart';
 
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   final AuthService authService;

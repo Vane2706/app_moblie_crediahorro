@@ -4,6 +4,7 @@ import 'package:crediahorro/src/features/auth/login/bloc/LoginEvent.dart';
 import 'package:crediahorro/src/features/auth/login/bloc/LoginState.dart';
 import 'package:crediahorro/src/services/AuthService.dart';
 
+//guarda los datos ingresados por teclado.
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final AuthService authService;
 
@@ -23,7 +24,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(state.copyWith(status: Resource.loading()));
       try {
         await authService.login(state.username, state.password);
-        emit(state.copyWith(status: Resource.success("Login Successful")));
+        emit(state.copyWith(status: Resource.success("Ingreso correctamente")));
       } catch (e) {
         emit(state.copyWith(status: Resource.error("Credenciales inválidas")));
       }

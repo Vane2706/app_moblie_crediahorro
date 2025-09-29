@@ -116,7 +116,7 @@ class _ProfileOverviewPageState extends State<ProfileOverviewPage> {
 
             const SizedBox(height: 30),
 
-            // Finalización de préstamos pagados (gráfico falso / estático)
+            // Finalización de préstamos pagados
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(

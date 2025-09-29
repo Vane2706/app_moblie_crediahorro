@@ -3,10 +3,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class AuthService {
-  static const String _baseUrl =
-      'https://gateway-production-7c45.up.railway.app/auth-service/auth';
+  static const String
+  _baseUrl = //conecta con los microservicios mediante un api
+      'https://gateway-production-7c45.up.railway.app/auth-service/auth'; //railway/path/controller
 
-  // LOGIN
+  // LOGINaccestoken mediante el auth interceptor
   Future<void> login(String username, String password) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/login'),

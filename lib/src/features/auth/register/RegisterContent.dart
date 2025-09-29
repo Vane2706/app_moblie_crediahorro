@@ -39,15 +39,10 @@ class _RegisterContentState extends State<RegisterContent> {
         backgroundColor: Colors.white,
         body: Stack(
           children: [
-            // 👉 Fondo con imagen en lugar de las "bolas azules"
             Positioned.fill(
-              child: Image.asset(
-                "assets/img/login.jpeg", // 👈 coloca aquí tu imagen
-                fit: BoxFit.cover,
-              ),
+              child: Image.asset("assets/img/login.jpeg", fit: BoxFit.cover),
             ),
 
-            // Contenido principal
             Center(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -57,7 +52,6 @@ class _RegisterContentState extends State<RegisterContent> {
                   children: [
                     const SizedBox(height: 60),
 
-                    // Título
                     const Center(
                       child: Text(
                         "CREDIAHORRO",
@@ -72,7 +66,6 @@ class _RegisterContentState extends State<RegisterContent> {
 
                     const SizedBox(height: 40),
 
-                    // Campos + Botón Flecha
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -98,7 +91,6 @@ class _RegisterContentState extends State<RegisterContent> {
 
                     const SizedBox(height: 20),
 
-                    // Ir a login
                     Center(
                       child: TextButton(
                         onPressed: () {
@@ -120,7 +112,6 @@ class _RegisterContentState extends State<RegisterContent> {
     );
   }
 
-  // Campos de entrada con mismo estilo que login
   Widget _buildUserField(BuildContext context) {
     return TextField(
       decoration: _inputDecoration("Usuario", Icons.person),

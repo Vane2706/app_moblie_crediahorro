@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 abstract class LoginEvent extends Equatable {
   const LoginEvent();
-
+  //define los eventos a realizar.
   @override
   List<Object?> get props => [];
 }

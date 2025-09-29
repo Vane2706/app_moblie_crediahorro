@@ -14,7 +14,7 @@ class SettingsPage extends StatelessWidget {
     final AuthService _authService = AuthService();
     final List<_SettingItem> items = [
       _SettingItem(
-        title: "Editar Perfil",
+        title: "Perfil",
         icon: Icons.person,
         onTap: () => Navigator.pushNamed(context, AppRouter.perfil),
       ),
@@ -24,7 +24,6 @@ class SettingsPage extends StatelessWidget {
         onTap: () {},
       ),
       _SettingItem(title: "Seguridad", icon: Icons.lock, onTap: () {}),
-      _SettingItem(title: "Temas", icon: Icons.palette, onTap: () {}),
       _SettingItem(
         title: "Cerrar Sesión",
         icon: Icons.logout,

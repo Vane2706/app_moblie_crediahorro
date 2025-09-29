@@ -1,85 +1,25 @@
-import 'package:crediahorro/src/features/clients/models/cliente.dart';
-import 'package:crediahorro/src/routing/app_router.dart';
-import 'package:crediahorro/src/services/cliente_service.dart';
+import 'package:crediahorro/src/domain/utils/Resource.dart';
 import 'package:flutter/material.dart';
-import 'package:crediahorro/src/common_widgets/app_scaffold.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:crediahorro/src/constants/app_colors.dart';
+import 'package:crediahorro/src/features/clients/models/cliente.dart';
+import 'package:crediahorro/src/features/dashboard/bloc/DashboardBloc.dart';
+import 'package:crediahorro/src/features/dashboard/bloc/DashboardEvent.dart';
+import 'package:crediahorro/src/features/dashboard/bloc/DashboardState.dart';
+import 'package:crediahorro/src/routing/app_router.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+class DashboardContent extends StatefulWidget {
+  const DashboardContent({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<DashboardContent> createState() => _DashboardContentState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
-  final ClienteService _clienteService = ClienteService();
-  List<Cliente> _clientes = [];
-  bool _loading = true;
-
-  // Secciones
-  List<Cliente> _anteriores = [];
-  List<Cliente> _hoy = [];
-  List<Cliente> _proximos = [];
-
+class _DashboardContentState extends State<DashboardContent> {
   @override
   void initState() {
     super.initState();
-    _fetchClientes();
-  }
-
-  void _fetchClientes() async {
-    try {
-      final data = await _clienteService.getClientes();
-      _clasificarClientes(data);
-      setState(() {
-        _clientes = data;
-        _loading = false;
-      });
-    } catch (e) {
-      setState(() => _loading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Error cargando clientes: $e")));
-    }
-  }
-
-  void _clasificarClientes(List<Cliente> clientes) {
-    final hoy = DateTime.now();
-    final hoyDate = DateTime(hoy.year, hoy.month, hoy.day);
-
-    _anteriores.clear();
-    _hoy.clear();
-    _proximos.clear();
-
-    for (final cliente in clientes) {
-      if (cliente.prestamos == null || cliente.prestamos!.isEmpty) continue;
-
-      for (final prestamo in cliente.prestamos!) {
-        if (prestamo.cuotas == null) continue;
-
-        for (final cuota in prestamo.cuotas!) {
-          if (cuota.estado != "PENDIENTE") continue;
-
-          final fecha = DateTime.tryParse(cuota.fechaPago);
-          if (fecha == null) continue;
-
-          final fechaPago = DateTime(fecha.year, fecha.month, fecha.day);
-          final diferencia = fechaPago.difference(hoyDate).inDays;
-
-          if (fechaPago.isAtSameMomentAs(hoyDate)) {
-            _hoy.add(cliente);
-            break;
-          } else if (diferencia > 0 && diferencia <= 3) {
-            _anteriores.add(cliente);
-            break;
-          } else if (fechaPago.isBefore(hoyDate)) {
-            _proximos.add(cliente);
-            break;
-          }
-        }
-      }
-    }
+    context.read<DashboardBloc>().add(DashboardLoadClientes());
   }
 
   void _mostrarAccionesCliente(Cliente cliente) {
@@ -145,7 +85,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               tilePadding: const EdgeInsets.symmetric(horizontal: 12),
               backgroundColor: AppColors.surface,
               collapsedBackgroundColor: AppColors.surface,
-              trailing: const SizedBox.shrink(), // quitamos ícono de la derecha
+              trailing: const SizedBox.shrink(),
               onExpansionChanged: (isOpen) {
                 setStateSB(() {
                   expanded = isOpen;
@@ -242,35 +182,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-      title: "CREDIAHORRO",
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(12),
-              children: [
-                _buildSection("Anterior", _anteriores),
-                _buildSection("Hoy", _hoy),
-                _buildSection("Próximo", _proximos),
-                const SizedBox(height: 25),
-                Center(
-                  child: GestureDetector(
-                    onTap: () =>
-                        Navigator.pushNamed(context, AppRouter.clientes),
-                    child: const Text(
-                      "Verifique todos los clientes",
-                      style: TextStyle(
-                        color: AppColors.secondary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
+    return BlocBuilder<DashboardBloc, DashboardState>(
+      builder: (context, state) {
+        if (state.status?.status == Status.loading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state.status?.status == Status.error) {
+          return Center(child: Text(state.status?.message ?? "Error"));
+        }
+
+        return ListView(
+          padding: const EdgeInsets.all(12),
+          children: [
+            _buildSection("Anterior", state.anteriores),
+            _buildSection("Hoy", state.hoy),
+            _buildSection("Próximo", state.proximos),
+            const SizedBox(height: 25),
+            Center(
+              child: GestureDetector(
+                onTap: () => Navigator.pushNamed(context, AppRouter.clientes),
+                child: const Text(
+                  "Verifique todos los clientes",
+                  style: TextStyle(
+                    color: AppColors.secondary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    decoration: TextDecoration.underline,
                   ),
                 ),
-                const SizedBox(height: 20),
-              ],
+              ),
             ),
+            const SizedBox(height: 20),
+          ],
+        );
+      },
     );
   }
 }
