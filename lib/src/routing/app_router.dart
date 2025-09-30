@@ -1,16 +1,18 @@
 import 'package:crediahorro/src/features/auth/login/LoginPage.dart';
 import 'package:crediahorro/src/features/auth/register/RegisterPage.dart';
-import 'package:crediahorro/src/features/clients/create/ClienteFormPage.dart';
-import 'package:crediahorro/src/features/clients/edit/ClienteEditPage.dart';
-import 'package:crediahorro/src/features/clients/view/ClientsPage.dart';
-import 'package:crediahorro/src/features/cuotas/CuotasPage.dart';
-import 'package:crediahorro/src/features/dashboard/DashboardPage.dart';
-import 'package:crediahorro/src/features/loans/create/LoanFormPage.dart';
-import 'package:crediahorro/src/features/loans/edit/LoanEditPage.dart';
-import 'package:crediahorro/src/features/loans/view/LoansPage.dart';
+import 'package:crediahorro/src/features/admin/clients/create/ClienteFormPage.dart';
+import 'package:crediahorro/src/features/admin/clients/edit/ClienteEditPage.dart';
+import 'package:crediahorro/src/features/admin/clients/view/ClientsPage.dart';
+import 'package:crediahorro/src/features/admin/cuotas/CuotasPage.dart';
+import 'package:crediahorro/src/features/admin/dashboard/DashboardPage.dart';
+import 'package:crediahorro/src/features/admin/loans/create/LoanFormPage.dart';
+import 'package:crediahorro/src/features/admin/loans/edit/LoanEditPage.dart';
+import 'package:crediahorro/src/features/admin/loans/view/LoansPage.dart';
+import 'package:crediahorro/src/features/cliente/cuotas/CuotasClientePage.dart';
+import 'package:crediahorro/src/features/cliente/dashboard/PrestamosClientePage.dart';
 import 'package:crediahorro/src/features/profile/profile_overview_page.dart';
 import 'package:crediahorro/src/features/profile/profile_page.dart';
-import 'package:crediahorro/src/features/reports/reports_page.dart';
+import 'package:crediahorro/src/features/admin/reports/reports_page.dart';
 import 'package:crediahorro/src/features/settings/settings_page.dart';
 import 'package:flutter/material.dart';
 
@@ -29,6 +31,8 @@ class AppRouter {
   static const String clienteEdit = '/cliente-edit';
   static const String perfil = '/perfil';
   static const String perfiloverview = '/perfiloverview';
+  static const String prestamosclientes = '/prestamosclientes';
+  static const String cuotasclientes = '/cuotasclientes';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -78,6 +82,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ProfilePage());
       case perfiloverview:
         return MaterialPageRoute(builder: (_) => const ProfileOverviewPage());
+      case prestamosclientes:
+        return MaterialPageRoute(builder: (_) => const PrestamosClientePage());
+      case cuotasclientes:
+        return MaterialPageRoute(builder: (_) => const CuotasClientePage());
       default:
         return MaterialPageRoute(
           builder: (_) =>

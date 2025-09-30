@@ -22,9 +22,10 @@ class _LoginContentState extends State<LoginContent> {
       listener: (context, state) {
         if (state.status != null) {
           if (state.status!.status == Status.success) {
+            final route = state.status!.data;
             Navigator.pushNamedAndRemoveUntil(
               context,
-              AppRouter.dashboard,
+              route,
               (route) => false, //borra la ruta anterior
             );
           } else if (state.status!.status == Status.error) {
